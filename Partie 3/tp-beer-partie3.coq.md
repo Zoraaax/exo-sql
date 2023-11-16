@@ -125,11 +125,64 @@ ORDER BY
 
 ```mysql
 
+SELECT
+    `ID_ARTICLE`,
+    `NOM_ARTICLE`,
+    `VOLUME`,
+    (
+        SELECT
+            SUM(`QUANTITE`)
+        FROM ventes
+        WHERE
+            `ID_ARTICLE` = article.`ID_ARTICLE`
+            AND `ANNEE` = 2016
+    ) as total_quantity_sell
+FROM article
+ORDER BY
+    `total_quantity_sell` DESC LIMIT 20
+
 ```
 
 ## 26. Donner l’ID, le nom, le volume et la quantité vendue des 5 ‘Trappistes’ les plus vendus en 2016.
 
 ```mysql
+
+SELECT
+    article.`ID_ARTICLE`,
+    article.`NOM_ARTICLE`,
+    article.`VOLUME`,
+    (
+        SELECT
+            SUM(`QUANTITE`)
+        FROM ventes
+        WHERE
+            `ID_ARTICLE` = article.`ID_ARTICLE`
+            AND `ANNEE` = 2016
+    ) as total_quantity_sell
+FROM article
+ORDER BY
+    `total_quantity_sell` DESC LIMIT 20
+
+
+SELECT
+    article.`ID_ARTICLE`,
+    article.`NOM_ARTICLE`,
+    article.`VOLUME`,
+    (
+        SELECT
+            SUM(`QUANTITE`)
+        FROM ventes
+        WHERE
+            `ID_ARTICLE` = article.`ID_ARTICLE`
+            AND `ANNEE` = 2016
+    ) as total_quantity_sell
+FROM article
+    INNER JOIN type ON type.`ID_TYPE` = article.`ID_TYPE`
+WHERE
+    type.`NOM_TYPE` = 'Trappiste'
+ORDER BY
+    `total_quantity_sell` DESC
+LIMIT 5;
 
 ```
 

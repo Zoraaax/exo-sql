@@ -256,3 +256,40 @@ SELECT `NOM_COULEUR`, (
 FROM couleur c
 ORDER BY
     `total_quantity_sell` DESC
+
+SELECT
+    article.`ID_ARTICLE`,
+    article.`NOM_ARTICLE`,
+    article.`VOLUME`,
+    (
+        SELECT
+            SUM(`QUANTITE`)
+        FROM ventes
+        WHERE
+            `ID_ARTICLE` = article.`ID_ARTICLE`
+            AND `ANNEE` = 2016
+    ) as total_quantity_sell
+FROM article
+ORDER BY
+    `total_quantity_sell` DESC LIMIT 20
+
+
+SELECT
+    article.`ID_ARTICLE`,
+    article.`NOM_ARTICLE`,
+    article.`VOLUME`,
+    (
+        SELECT
+            SUM(`QUANTITE`)
+        FROM ventes
+        WHERE
+            `ID_ARTICLE` = article.`ID_ARTICLE`
+            AND `ANNEE` = 2016
+    ) as total_quantity_sell
+FROM article
+    INNER JOIN type ON type.`ID_TYPE` = article.`ID_TYPE`
+WHERE
+    type.`NOM_TYPE` = 'Trappiste'
+ORDER BY
+    `total_quantity_sell` DESC
+LIMIT 5;
