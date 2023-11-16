@@ -6,6 +6,16 @@
 
 ```mysql
 
+FROM article
+WHERE `ID_ARTICLE` IN (
+        SELECT `ID_ARTICLE`
+        FROM ventes
+        WHERE `ANNEE` = 2014
+        GROUP BY `ID_ARTICLE`
+        HAVING
+            SUM(`QUANTITE`) IS NULL
+    )
+
 ```
 
 ## 21. Codez de 2 manières différentes la requête suivante : Listez les pays qui fabriquent des bières de type ‘Trappiste’.
@@ -14,11 +24,42 @@
 
 ```mysql
 
+SELECT
+    `NOM_PAYS`,
+    `NOM_MARQUE`,
+    `NOM_TYPE`
+FROM pays
+    INNER JOIN marque ON marque.`ID_PAYS` = pays.`ID_PAYS`
+    INNER JOIN article ON article.`ID_MARQUE` = marque.`ID_MARQUE`
+    INNER JOIN type ON type.`ID_TYPE` = article.`ID_TYPE`
+WHERE `NOM_TYPE` = 'Trappiste'
+
 ```
 
 ### Méthode 2 - Avec sous Requête
 
 ```mysql
+
+SELECT `NOM_PAYS`
+FROM pays
+WHERE `ID_PAYS` IN (
+        SELECT `ID_PAYS`
+        FROM marque
+        WHERE `ID_MARQUE` IN (
+                SELECT
+                    `ID_MARQUE`
+                FROM article
+                WHERE
+                    `ID_TYPE` IN (
+                        SELECT
+                            `ID_TYPE`
+                        FROM
+                            type
+                        WHERE
+                            `NOM_TYPE` = 'Trappiste'
+                    )
+            )
+    )
 
 ```
 
@@ -26,17 +67,57 @@
 
 ```mysql
 
+SELECT DISTINCT
+    `NUMERO_TICKET`
+FROM ventes
+WHERE ventes.`ID_ARTICLE` IN (
+    SELECT `ID_ARTICLE`
+    FROM ventes
+    WHERE `NUMERO_TICKET` = '2014-856'
+)
+
 ```
 
 ## 23. Listez les articles ayant un degré d’alcool plus élevé que la plus forte des trappistes.
 
 ```mysql
 
+SELECT
+    `NOM_ARTICLE`,
+    `TITRAGE`
+FROM article
+WHERE `TITRAGE` > (
+        SELECT MAX(`TITRAGE`)
+        FROM article
+        WHERE `ID_TYPE` = (
+                SELECT
+                    `ID_TYPE`
+                FROM type
+                WHERE
+                    `NOM_TYPE` = 'Trappiste'
+            )
+    )
+ORDER BY `TITRAGE` DESC
+
 ```
 
-## 24. Editez les quantités vendues pour chaque couleur en 2014.
+## 24. Afficher les quantités vendues pour chaque couleur en 2014.
 
 ```mysql
+
+SELECT `NOM_COULEUR`, (
+        SELECT
+            SUM(`QUANTITE`)
+        FROM article
+            INNER JOIN couleur ON article.`ID_COULEUR` = couleur.`ID_COULEUR`
+            INNER JOIN ventes ON ventes.`ID_ARTICLE` = article.`ID_ARTICLE`
+        WHERE
+            `ANNEE` = 2014
+            AND couleur.`NOM_COULEUR` = c.`NOM_COULEUR`
+    ) as total_quantity_sell
+FROM couleur c
+ORDER BY
+    `total_quantity_sell` DESC
 
 ```
 
